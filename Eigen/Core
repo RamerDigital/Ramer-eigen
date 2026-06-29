@@ -24,13 +24,7 @@
 // This detects SSE/AVX/NEON/etc. and configure alignment settings
 #include "src/Core/util/ConfigureVectorization.h"
 
-// We need cuda_runtime.h/hip_runtime.h to ensure that
-// the EIGEN_USING_STD macro works properly on the device side
-#if defined(EIGEN_CUDACC)
-#include <cuda_runtime.h>
-#elif defined(EIGEN_HIPCC)
-#include <hip/hip_runtime.h>
-#endif
+
 
 #ifdef EIGEN_EXCEPTIONS
 #include <new>
@@ -54,13 +48,7 @@
 // and inclusion of their respective header files
 #include "src/Core/util/MKL_support.h"
 
-#if defined(EIGEN_HAS_CUDA_FP16) || defined(EIGEN_HAS_HIP_FP16)
-#define EIGEN_HAS_GPU_FP16
-#endif
 
-#if defined(EIGEN_HAS_CUDA_BF16) || defined(EIGEN_HAS_HIP_BF16)
-#define EIGEN_HAS_GPU_BF16
-#endif
 
 #if (defined _OPENMP) && (!defined EIGEN_DONT_PARALLELIZE)
 #define EIGEN_HAS_OPENMP
@@ -127,23 +115,7 @@
 #include <intrin.h>
 #endif
 
-#if defined(EIGEN_USE_SYCL)
-#undef min
-#undef max
-#undef isnan
-#undef isinf
-#undef isfinite
-#include <CL/sycl.hpp>
-#include <map>
-#include <thread>
-#include <utility>
-#ifndef EIGEN_SYCL_LOCAL_THREAD_DIM0
-#define EIGEN_SYCL_LOCAL_THREAD_DIM0 16
-#endif
-#ifndef EIGEN_SYCL_LOCAL_THREAD_DIM1
-#define EIGEN_SYCL_LOCAL_THREAD_DIM1 16
-#endif
-#endif
+
 
 #if defined EIGEN2_SUPPORT_STAGE40_FULL_EIGEN3_STRICTNESS || defined EIGEN2_SUPPORT_STAGE30_FULL_EIGEN3_API || \
     defined EIGEN2_SUPPORT_STAGE20_RESOLVE_API_CONFLICTS || defined EIGEN2_SUPPORT_STAGE10_FULL_EIGEN2_API ||  \
@@ -205,97 +177,14 @@ using std::ptrdiff_t;
 #include "src/Core/arch/Default/BFloat16.h"
 #include "src/Core/arch/Default/GenericPacketMathFunctionsFwd.h"
 
-#if defined EIGEN_VECTORIZE_AVX512
-#include "src/Core/arch/SSE/PacketMath.h"
-#include "src/Core/arch/SSE/Reductions.h"
-#include "src/Core/arch/AVX/PacketMath.h"
-#include "src/Core/arch/AVX/Reductions.h"
-#include "src/Core/arch/AVX512/PacketMath.h"
-#include "src/Core/arch/AVX512/Reductions.h"
-#if defined EIGEN_VECTORIZE_AVX512FP16
-#include "src/Core/arch/AVX512/PacketMathFP16.h"
-#endif
-#include "src/Core/arch/SSE/TypeCasting.h"
-#include "src/Core/arch/AVX/TypeCasting.h"
-#include "src/Core/arch/AVX512/TypeCasting.h"
-#if defined EIGEN_VECTORIZE_AVX512FP16
-#include "src/Core/arch/AVX512/TypeCastingFP16.h"
-#endif
-#include "src/Core/arch/SSE/Complex.h"
-#include "src/Core/arch/AVX/Complex.h"
-#include "src/Core/arch/AVX512/Complex.h"
-#include "src/Core/arch/SSE/MathFunctions.h"
-#include "src/Core/arch/AVX/MathFunctions.h"
-#include "src/Core/arch/AVX512/MathFunctions.h"
-#if defined EIGEN_VECTORIZE_AVX512FP16
-#include "src/Core/arch/AVX512/MathFunctionsFP16.h"
-#endif
-#include "src/Core/arch/AVX512/TrsmKernel.h"
-#elif defined EIGEN_VECTORIZE_AVX
-// Use AVX for floats and doubles, SSE for integers
-#include "src/Core/arch/SSE/PacketMath.h"
-#include "src/Core/arch/SSE/Reductions.h"
-#include "src/Core/arch/SSE/TypeCasting.h"
-#include "src/Core/arch/SSE/Complex.h"
-#include "src/Core/arch/AVX/PacketMath.h"
-#include "src/Core/arch/AVX/Reductions.h"
-#include "src/Core/arch/AVX/TypeCasting.h"
-#include "src/Core/arch/AVX/Complex.h"
-#include "src/Core/arch/SSE/MathFunctions.h"
-#include "src/Core/arch/AVX/MathFunctions.h"
-#elif defined EIGEN_VECTORIZE_SSE
-#include "src/Core/arch/SSE/PacketMath.h"
-#include "src/Core/arch/SSE/Reductions.h"
-#include "src/Core/arch/SSE/TypeCasting.h"
-#include "src/Core/arch/SSE/MathFunctions.h"
-#include "src/Core/arch/SSE/Complex.h"
-#endif
-
-#if defined(EIGEN_VECTORIZE_ALTIVEC) || defined(EIGEN_VECTORIZE_VSX)
-#include "src/Core/arch/AltiVec/PacketMath.h"
-#include "src/Core/arch/AltiVec/TypeCasting.h"
-#include "src/Core/arch/AltiVec/MathFunctions.h"
-#include "src/Core/arch/AltiVec/Complex.h"
-#elif defined EIGEN_VECTORIZE_NEON
+#if defined EIGEN_VECTORIZE_NEON
 #include "src/Core/arch/NEON/PacketMath.h"
 #include "src/Core/arch/NEON/TypeCasting.h"
 #include "src/Core/arch/NEON/MathFunctions.h"
 #include "src/Core/arch/NEON/Complex.h"
-#elif defined EIGEN_VECTORIZE_LSX
-#include "src/Core/arch/LSX/PacketMath.h"
-#include "src/Core/arch/LSX/TypeCasting.h"
-#include "src/Core/arch/LSX/MathFunctions.h"
-#include "src/Core/arch/LSX/Complex.h"
-#elif defined EIGEN_VECTORIZE_SVE
-#include "src/Core/arch/SVE/PacketMath.h"
-#include "src/Core/arch/SVE/TypeCasting.h"
-#include "src/Core/arch/SVE/MathFunctions.h"
-#elif defined EIGEN_VECTORIZE_ZVECTOR
-#include "src/Core/arch/ZVector/PacketMath.h"
-#include "src/Core/arch/ZVector/MathFunctions.h"
-#include "src/Core/arch/ZVector/Complex.h"
-#elif defined EIGEN_VECTORIZE_MSA
-#include "src/Core/arch/MSA/PacketMath.h"
-#include "src/Core/arch/MSA/MathFunctions.h"
-#include "src/Core/arch/MSA/Complex.h"
-#elif defined EIGEN_VECTORIZE_HVX
-#include "src/Core/arch/HVX/PacketMath.h"
 #endif
 
-#if defined EIGEN_VECTORIZE_GPU
-#include "src/Core/arch/GPU/PacketMath.h"
-#include "src/Core/arch/GPU/MathFunctions.h"
-#include "src/Core/arch/GPU/TypeCasting.h"
-#endif
 
-#if defined(EIGEN_USE_SYCL)
-#include "src/Core/arch/SYCL/InteropHeaders.h"
-#if !defined(EIGEN_DONT_VECTORIZE_SYCL)
-#include "src/Core/arch/SYCL/PacketMath.h"
-#include "src/Core/arch/SYCL/MathFunctions.h"
-#include "src/Core/arch/SYCL/TypeCasting.h"
-#endif
-#endif
 
 #include "src/Core/arch/Default/Settings.h"
 // This file provides generic implementations valid for scalar as well
@@ -308,10 +197,7 @@ using std::ptrdiff_t;
 #include "src/Core/functors/StlFunctors.h"
 #include "src/Core/functors/AssignmentFunctors.h"
 
-// Specialized functors for GPU.
-#ifdef EIGEN_GPUCC
-#include "src/Core/arch/GPU/Complex.h"
-#endif
+
 
 // Specializations of vectorized activation functions for NEON.
 #ifdef EIGEN_VECTORIZE_NEON
