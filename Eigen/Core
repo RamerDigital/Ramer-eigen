@@ -104,6 +104,9 @@
 #include <bit>
 #endif
 
+// for C++20 Ranges
+#include <ranges>
+
 // for outputting debug info
 #ifdef EIGEN_DEBUG_ASSIGN
 #include <iostream>

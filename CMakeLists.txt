@@ -272,12 +272,9 @@ endif()
 # General Build Configuration.
 #==============================================================================
 
-# Avoid setting the standard in a parent if unset.
-if(PROJECT_IS_TOP_LEVEL)
-  set(CMAKE_CXX_STANDARD 14 CACHE STRING "Default C++ standard")
-  set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE BOOL "Require C++ standard")
-  set(CMAKE_CXX_EXTENSIONS OFF CACHE BOOL "Allow C++ extensions")
-endif()
+set(CMAKE_CXX_STANDARD 20 CACHE STRING "Default C++ standard")
+set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE BOOL "Require C++ standard")
+set(CMAKE_CXX_EXTENSIONS OFF CACHE BOOL "Allow C++ extensions")
 
 # Apple Silicon M-series CPU target selection for optimization
 if (APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
