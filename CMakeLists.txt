@@ -55,6 +55,10 @@ option(EIGEN_LEAVE_TEST_IN_ALL_TARGET "Leaves tests in the all target, needed by
 # Determine if we should build BLAS/LAPACK implementations.
 option(EIGEN_BUILD_BLAS "Toggles the building of the Eigen Blas library" ${PROJECT_IS_TOP_LEVEL})
 option(EIGEN_BUILD_LAPACK "Toggles the building of the included Eigen LAPACK library" ${PROJECT_IS_TOP_LEVEL})
+option(EIGEN_USE_METAL "Enable Apple Metal GPU acceleration for GEMM" OFF)
+if(EIGEN_USE_METAL)
+  add_compile_definitions(EIGEN_USE_METAL)
+endif()
 if (EIGEN_BUILD_BLAS OR EIGEN_BUILD_LAPACK)
   # Determine if we should build shared libraries for BLAS/LAPACK on this platform.
   if (NOT EIGEN_BUILD_SHARED_LIBS)

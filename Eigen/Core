@@ -328,6 +328,10 @@ using std::ptrdiff_t;
 #include "src/Core/products/TriangularSolverMatrix_BLAS.h"
 #endif  // EIGEN_USE_BLAS
 
+#ifdef EIGEN_USE_METAL
+#include "src/Core/products/GeneralMatrixMatrix_Metal.h"
+#endif  // EIGEN_USE_METAL
+
 #ifdef EIGEN_USE_MKL_VML
 #include "src/Core/Assign_MKL.h"
 #endif
