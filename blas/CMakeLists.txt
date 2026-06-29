@@ -13,6 +13,10 @@ set(EigenBlas_SRCS  single.cpp double.cpp complex_single.cpp complex_double.cpp 
                     f2c/ztbmv.c   f2c/complexdots.c
    )
 
+if(EIGEN_USE_METAL)
+  list(APPEND EigenBlas_SRCS ../Eigen/src/Core/products/GeneralMatrixMatrix_Metal.mm)
+endif()
+
 set(EIGEN_BLAS_TARGETS "")
 
 add_library(eigen_blas_static STATIC ${EigenBlas_SRCS})
@@ -28,6 +32,9 @@ endif()
 foreach(target IN LISTS EIGEN_BLAS_TARGETS)
   if(EIGEN_STANDARD_LIBRARIES_TO_LINK_TO)
       target_link_libraries(${target} ${EIGEN_STANDARD_LIBRARIES_TO_LINK_TO})
+  endif()
+  if(EIGEN_USE_METAL)
+      target_link_libraries(${target} PRIVATE "-framework Metal" "-framework MetalPerformanceShaders" "-framework Foundation")
   endif()
 
   add_dependencies(blas ${target})
