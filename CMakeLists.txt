@@ -279,6 +279,20 @@ if(PROJECT_IS_TOP_LEVEL)
   set(CMAKE_CXX_EXTENSIONS OFF CACHE BOOL "Allow C++ extensions")
 endif()
 
+# Apple Silicon M-series CPU target selection for optimization
+if (APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(EIGEN_APPLE_M_CPU "apple-m1" CACHE STRING "Target Apple Silicon M-series CPU (e.g. apple-m1, apple-m2, apple-m3, apple-m4)")
+  if (EIGEN_APPLE_M_CPU)
+    message(STATUS "Optimizing for Apple Silicon M-series CPU target: ${EIGEN_APPLE_M_CPU}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=${EIGEN_APPLE_M_CPU}")
+  endif()
+  option(EIGEN_APPLE_FAST_MATH "Enable compiler -ffast-math optimizations (may violate IEEE-754 correctness guarantees)" OFF)
+  if (EIGEN_APPLE_FAST_MATH)
+    message(STATUS "Enabling -ffast-math optimizations")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
+  endif()
+endif()
+
 # Guard against in-source builds
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there. You may need to remove CMakeCache.txt. ")
